@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alphine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: pact
       POSTGRES_PASSWORD: pact
