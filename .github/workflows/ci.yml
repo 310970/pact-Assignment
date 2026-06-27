@@ -1,0 +1,71 @@
+name: CI
+ 
+on: [push, pull_request]
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+ 
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+          cache: 'maven'
+ 
+      - name: Install Pact CLI
+        run: |
+          curl -fsSL https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v2.4.5/pact-2.4.5-linux-x86_64.tar.gz | tar xz -C $HOME
+          echo "$HOME/pact/bin" >> $GITHUB_PATH
+ 
+      - name: Start Pact Broker
+ 
+        run: |
+          docker compose -f src/test/java/com/example/ust/sdet/docker/docker-compose.pact-broker.yml down -v
+          docker compose -f src/test/java/com/example/ust/sdet/docker/docker-compose.pact-broker.yml up -d --wait
+ 
+      - name: Run Consumer Tests & Publish Contracts
+        run: |
+          mvn -Dtest=PosOmsConsumerPactTest test
+     
+      - name: Consumer Publish Contracts to the Borker
+        run: |
+          pact-broker publish target/pacts \
+            --consumer-app-version=${{ github.sha }} \
+            --branch=main \
+            --broker-base-url=http://127.0.0.1:9292
+     
+      - name: Run Provider Verification
+   
+        run: |
+          mvn -Dtest=OmsProviderVerification \
+              -Dgit.sha=${{ github.sha }} \
+              -Dpact.broker.url=http://127.0.0.1:9292 \
+              -Dpact.verifier.publishResults=true \
+              -Dpact.provider.branch=main \
+              test
+ 
+      - name: Mark Provider as Deployed
+        env:
+          PROVIDER_VERSION: ${{ github.sha }}
+        run: |
+          pact-broker record-deployment \
+            --pacticipant oms-provider \
+            --version $PROVIDER_VERSION \
+            --environment production \
+            --broker-base-url http://127.0.0.1:9292
+ 
+      - name:  Can I deploy
+        env:
+            CONSUMER_VERSION: ${{ github.sha }}
+            PROVIDER_VERSION: ${{ github.sha }}
+        run: |
+          pact-broker can-i-deploy \
+            --pacticipant pos-consumer \
+            --version $CONSUMER_VERSION \
+            --to-environment production \
+            --broker-base-url http://127.0.0.1:9292
