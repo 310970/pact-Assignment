@@ -25,8 +25,8 @@ jobs:
       - name: Start Pact Broker
  
         run: |
-          docker compose -f src/test/java/com/example/ust/sdet/docker/docker-compose.pact-broker.yml down -v
-          docker compose -f src/test/java/com/example/ust/sdet/docker/docker-compose.pact-broker.yml up -d --wait
+          docker compose -f src/test/java/com/ust/sdet/docker/docker-compose.pact-broker.yml down -v
+          docker compose -f src/test/java/com/ust/sdet/docker/docker-compose.pact-broker.yml up -d --wait
  
       - name: Run Consumer Tests & Publish Contracts
         run: |
