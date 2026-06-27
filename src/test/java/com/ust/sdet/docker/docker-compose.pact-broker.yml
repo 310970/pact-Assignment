@@ -21,13 +21,13 @@ services:
     ports:
       - "9292:9292"
     environment:
-      PACT_BROKER_PACT: "9292"
+      PACT_BROKER_PORT: "9292"
       PACT_BROKER_BASE_URL: http://localhost:9292
       PACT_BROKER_DATABASE_URL: postgres://pact:pact@postgres/pact
       PACT_BROKER_LOG_LEVEL: INFO
       PACT_BROKER_SQL_LOG_LEVEL: WARN
     healthcheck:
-      test: ["CMD-SHELL","wget -q -0 /dev/null http://127.0.0.1:9292/diagnostic/status/heartbeat"]
+      test: ["CMD-SHELL","wget -q -O /dev/null http://127.0.0.1:9292/diagnostic/status/heartbeat"]
       interval: 5s
       timeout: 5s
       retries: 24
