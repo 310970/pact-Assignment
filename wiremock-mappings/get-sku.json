@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/skus/9"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 9,
+      "name": "Product SKU 9",
+      "stock": 100
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/orders/123"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 123,
+      "status": "Confirmed",
+      "total": 42
+    }
+  }
+}
